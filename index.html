@@ -1,197 +1,822 @@
-<!DOCTYPE html><html lang="th"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Wacoal DS Dashboard</title><script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script><style>
-*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Sarabun',Arial,sans-serif;background:#f4f5f7;color:#1a1a1a;font-size:15px}
-.top{background:#1a2340;color:#fff;padding:16px 28px}
-.tabs{display:flex;gap:4px;padding:14px 24px 0;background:#fff;border-bottom:1px solid #e5e7eb;flex-wrap:wrap}
-.tab{padding:9px 18px;font-size:13px;border:none;background:none;cursor:pointer;color:#6b7280;border-bottom:2px solid transparent;font-family:inherit}
-.tab.on{color:#1a2340;border-bottom-color:#1a2340;font-weight:700}
-.body{padding:20px 24px;max-width:1180px;margin:0 auto}
-.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px}
-.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px}
-.g2{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:14px}
-.card{background:#fff;border-radius:10px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.07);margin-bottom:14px}
-.metric{background:#fff;border-radius:10px;padding:14px 16px;box-shadow:0 1px 3px rgba(0,0,0,.07)}
-.ml{font-size:11px;color:#6b7280;margin-bottom:3px;font-weight:500}.mv{font-size:22px;font-weight:700;color:#111}.ms{font-size:11px;color:#9ca3af;margin-top:2px}
-.up{color:#059669}.dn{color:#dc2626}.bl{color:#2563eb}
-.pb{background:#f3f4f6;border-radius:4px;height:7px;overflow:hidden;margin-top:6px}.pf{height:100%;border-radius:4px}
-.ct{font-size:14px;font-weight:700;color:#111;margin-bottom:10px}.cw{position:relative;width:100%}
-.leg{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:9px;font-size:11px;color:#6b7280}.leg span{display:flex;align-items:center;gap:4px}.ld{width:10px;height:10px;border-radius:2px;flex-shrink:0}
-.note{background:#eff6ff;border-left:3px solid #3b82f6;border-radius:6px;padding:10px 12px;font-size:12px;color:#1e40af;margin-bottom:12px}
-.tbl{width:100%;border-collapse:collapse;font-size:13px}.tbl th{background:#f9fafb;padding:8px 10px;text-align:right;font-size:11px;color:#6b7280;font-weight:600;border-bottom:1px solid #e5e7eb}
-.tbl th:first-child{text-align:left}.tbl td{padding:8px 10px;text-align:right;border-bottom:1px solid #f3f4f6;color:#374151}.tbl td:first-child{text-align:left;color:#6b7280}.tbl tr:last-child td{font-weight:700;color:#111;border:none}
-.analysis{line-height:1.9;color:#374151}.analysis h1{font-size:20px;margin-bottom:12px;color:#1a2340}.analysis h2{font-size:16px;margin:18px 0 8px;color:#1a2340;border-bottom:1px solid #e5e7eb;padding-bottom:4px}.analysis li{margin-left:20px;margin-bottom:5px}.analysis strong{color:#1a2340}
-.v{display:none}.v.on{display:block}
-.stab{padding:7px 16px;font-size:12px;border:1px solid #d1d5db;border-radius:6px;cursor:pointer;font-family:inherit;background:#f3f4f6;color:#6b7280}.stab.on{background:#1a2340;color:#fff;font-weight:700}
-@media(max-width:700px){.g4,.g3{grid-template-columns:repeat(2,1fr)}.g2{grid-template-columns:1fr}.body{padding:14px}}
-</style></head><body><div class="top"><div style="font-size:17px;font-weight:700">Wacoal DS Sales Dashboard</div><div style="font-size:12px;opacity:.7;margin-top:2px">สร้างอัตโนมัติ &middot; 10 Apr 2026 09:11</div></div><div class="tabs"><button class="tab on" onclick="sw('ov',this)">ภาพรวม</button><button class="tab" onclick="sw('detail',this)">รายละเอียดรายวัน</button><button class="tab" onclick="sw('cmp',this)">เปรียบเทียบ</button><button class="tab" onclick="sw('rpt',this)">บทวิเคราะห์</button></div><div class="body"><div id="v-ov" class="v on" style="margin-top:14px"><div id="ov-cards"></div><div class="g2"><div class="card"><div class="ct">Monthly Trend — Forecast vs Target</div><div class="leg"><span><span class="ld" style="background:#2563eb"></span>Big C</span><span><span class="ld" style="background:#059669"></span>Lotus</span><span><span class="ld" style="background:#dc2626;border:1px dashed #dc2626"></span>Target</span></div><div class="cw" style="height:240px"><canvas id="cov1"></canvas></div></div><div class="card"><div class="ct">% Achievement vs Target</div><div class="cw" style="height:240px"><canvas id="cov2"></canvas></div></div></div></div><div id="v-detail" class="v" style="margin-top:14px"><div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px" id="sheet-tabs"></div><div id="detail-content"></div></div><div id="v-cmp" class="v" style="margin-top:14px"><div class="card"><div class="ct">เปรียบเทียบ Forecast ทุก Period</div><div class="cw" style="height:280px"><canvas id="ccmp1"></canvas></div></div><div class="g2"><div class="card"><div class="ct">% vs Target</div><div class="cw" style="height:220px"><canvas id="ccmp2"></canvas></div></div><div class="card"><div class="ct">ตารางสรุป</div><div id="cmp-table"></div></div></div></div><div id="v-rpt" class="v" style="margin-top:14px"><div class="card analysis"><p><h1>Wacoal DS Sales — บทวิเคราะห์อัตโนมัติ</h1>
-<em>สร้างเมื่อ 2026-04-10 09:11</em></p><p><h2>WACOAL LOTUS-BIGC IN APR 2026 (Apr 26)</h2>
-<li>ข้อมูลจริง <strong>9 วัน</strong> (กำลังดำเนินการ)</li>
-<li>ยอดขาย (Forecast): BigC 10.75M · Lotus 5.48M · <strong>รวม 15.86M</strong></li>
-<li>เป้าหมาย: BigC 11.13M · Lotus 6.58M · รวม 17.71M</li>
-<li>% Target: BigC <strong>96.6%</strong> · Lotus <strong>83.3%</strong> · รวม <strong>89.6%</strong></li>
-<li>vs Last Month: BigC +23.4% · Lotus +16.6% · รวม +18.3%</li>
-<li>vs Last Year: BigC +14.3% · Lotus -3.7% · รวม +5.1%</li></p><p><h2>WACOAL LOTUS-BIGC IN MAR 2026 (Mar 26)</h2>
-<li>ข้อมูลจริง <strong>31 วัน</strong></li>
-<li>ยอดขาย (Actual): BigC 8.71M · Lotus 4.67M · <strong>รวม 13.38M</strong></li>
-<li>เป้าหมาย: BigC 11.50M · Lotus 6.58M · รวม 18.08M</li>
-<li>% Target: BigC <strong>75.7%</strong> · Lotus <strong>71.0%</strong> · รวม <strong>74.0%</strong></li>
-<li>vs Last Month: BigC +12.4% · Lotus +11.3% · รวม +12.0%</li>
-<li>vs Last Year: BigC -14.3% · Lotus -20.4% · รวม -16.6%</li></p><p><h2>Key Insights</h2>
-<li>Trend MoM (Forecast): <strong>-15.6%</strong></li>
-<li>BigC เหนือกว่า Lotus: <strong>4.7 pp</strong> (75.7% vs 71.0%)</li>
-<li>⚠️  Lotus ยอดลดลง vs LY <strong>-20.4%</strong> — ควรตรวจสอบ</li></p></div></div></div><script>
-const RAW = {"Apr 26": {"header": "WACOAL LOTUS-BIGC IN APR 2026", "daily": [{"day": 1, "bigc": 310400.0, "lotus": 156436.98283900038, "total": 466836.9828390004, "bigc_pct": 0.8367304347826087, "lotus_pct": 0.7131685982366194, "total_pct": 0.7908167468857383}, {"day": 2, "bigc": 346645.4604, "lotus": 209880.97711299922, "total": 556526.4375129992, "bigc_pct": 0.9344355889043477, "lotus_pct": 0.9568103368386729, "total_pct": 0.9427497028908728}, {"day": 3, "bigc": 362792.4451999999, "lotus": 179164.9749259998, "total": 541957.4201259997, "bigc_pct": 0.9779622435826084, "lotus_pct": 0.8167815033391167, "total_pct": 0.0}, {"day": 4, "bigc": 426287.11189999996, "lotus": 235029.96799899926, "total": 661317.0798989992, "bigc_pct": 1.1491217799043476, "lotus_pct": 1.071460148230732, "total_pct": 0.0}, {"day": 5, "bigc": 499265.09229999996, "lotus": 286372.9650569978, "total": 785638.0573569977, "bigc_pct": 1.345845031417391, "lotus_pct": 1.3055238112892547, "total_pct": 0.0}, {"day": 6, "bigc": 395853.77600000007, "lotus": 135000.0, "total": 530853.7760000001, "bigc_pct": 1.067084091826087, "lotus_pct": 0.6154411764705883, "total_pct": 0.0}, {"day": 7, "bigc": 297157.4147, "lotus": 140000.0, "total": 437157.4147, "bigc_pct": 0.8010330309304349, "lotus_pct": 0.638235294117647, "total_pct": 0.0}, {"day": 8, "bigc": 268572.31120000005, "lotus": 150000.0, "total": 418572.31120000005, "bigc_pct": 0.7239775345391306, "lotus_pct": 0.6838235294117647, "total_pct": 0.0}, {"day": 9, "bigc": 316593.32269999996, "lotus": 152600.0, "total": 469193.32269999996, "bigc_pct": 0.8534254785826085, "lotus_pct": 0.6956764705882352, "total_pct": 0.0}, {"day": 10, "bigc": null, "lotus": null, "total": null, "bigc_pct": 0.0, "lotus_pct": 0.0, "total_pct": 0.0}, {"day": 11, "bigc": null, "lotus": null, "total": null, "bigc_pct": 0.0, "lotus_pct": 0.0, "total_pct": 0.0}, {"day": 12, "bigc": null, "lotus": null, "total": null, "bigc_pct": 0.0, "lotus_pct": 0.0, "total_pct": 0.0}, {"day": 13, "bigc": null, "lotus": null, "total": null, "bigc_pct": 0.0, "lotus_pct": 0.0, "total_pct": 0.0}, {"day": 14, "bigc": null, "lotus": null, "total": null, "bigc_pct": 0.0, "lotus_pct": 0.0, "total_pct": 0.0}, {"day": 15, "bigc": null, "lotus": null, "total": null, "bigc_pct": 0.0, "lotus_pct": 0.0, "total_pct": 0.0}, {"day": 16, "bigc": null, "lotus": null, "total": null, "bigc_pct": 0.0, "lotus_pct": 0.0, "total_pct": 0.0}, {"day": 17, "bigc": null, "lotus": null, "total": null, "bigc_pct": 0.0, "lotus_pct": 0.0, "total_pct": 0.0}, {"day": 18, "bigc": null, "lotus": null, "total": null, "bigc_pct": 0.0, "lotus_pct": 0.0, "total_pct": 0.0}, {"day": 19, "bigc": null, "lotus": null, "total": null, "bigc_pct": 0.0, "lotus_pct": 0.0, "total_pct": 0.0}, {"day": 20, "bigc": null, "lotus": null, "total": null, "bigc_pct": 0.0, "lotus_pct": 0.0, "total_pct": 0.0}, {"day": 21, "bigc": null, "lotus": null, "total": null, "bigc_pct": 0.0, "lotus_pct": 0.0, "total_pct": 0.0}, {"day": 22, "bigc": null, "lotus": null, "total": null, "bigc_pct": 0.0, "lotus_pct": 0.0, "total_pct": 0.0}, {"day": 23, "bigc": null, "lotus": null, "total": null, "bigc_pct": 0.0, "lotus_pct": 0.0, "total_pct": 0.0}, {"day": 24, "bigc": null, "lotus": null, "total": null, "bigc_pct": 0.0, "lotus_pct": 0.0, "total_pct": 0.0}, {"day": 25, "bigc": null, "lotus": null, "total": null, "bigc_pct": 0.0, "lotus_pct": 0.0, "total_pct": 0.0}, {"day": 26, "bigc": null, "lotus": null, "total": null, "bigc_pct": 0.0, "lotus_pct": 0.0, "total_pct": 0.0}, {"day": 27, "bigc": null, "lotus": null, "total": null, "bigc_pct": 0.0, "lotus_pct": 0.0, "total_pct": 0.0}, {"day": 28, "bigc": null, "lotus": null, "total": null, "bigc_pct": 0.0, "lotus_pct": 0.0, "total_pct": 0.0}, {"day": 29, "bigc": null, "lotus": null, "total": null, "bigc_pct": 0.0, "lotus_pct": 0.0, "total_pct": 0.0}, {"day": 30, "bigc": null, "lotus": null, "total": null, "bigc_pct": 0.0, "lotus_pct": 0.0, "total_pct": 0.0}], "actual_days": 9, "summary": {"total_bigc": 3223566.9343999997, "total_lotus": 1644485.8679339965, "total_total": 1023363.4203519996, "target_bigc": 11129032.258064521, "target_lotus": 6580645.161290325, "target_total": 17709677.419354837, "pct_bigc": 0.2896538404823187, "pct_lotus": 0.2498973622840876, "pct_total": 0.057785548325887046, "avg_bigc": 358174.1038222222, "avg_lotus": 182720.65199266627, "forecast_bigc": 10745223.114666667, "forecast_lotus": 5481619.559779989, "forecast_total": 15862133.015455993, "lm_pct_bigc": 0.23395949063273735, "lm_pct_lotus": 0.16583919121588897, "lm_pct_total": 0.18287723844405823, "ly_pct_bigc": 0.14260142727835712, "ly_pct_lotus": -0.037375365484267786, "ly_pct_total": 0.050567966210386395, "ly_total_bigc": 9404174.420000045, "ly_total_lotus": 5694451.776145983, "ly_total_total": 15098626.196146026, "lm_total_bigc": 8707922.096499974, "lm_total_lotus": 4701865.918629002, "lm_total_total": 13409788.015128976}}, "Mar 26": {"header": "WACOAL LOTUS-BIGC IN MAR 2026", "daily": [{"day": 1, "bigc": 401156.0860999969, "lotus": 194841.99496799993, "total": 595998.0810679968, "bigc_pct": 1.0813772755739046, "lotus_pct": 0.8882502711776467, "total_pct": 1.0096142356889564}, {"day": 2, "bigc": 286988.07049999805, "lotus": 122615.99772800018, "total": 409604.0682279982, "bigc_pct": 0.7736200161304295, "lotus_pct": 0.5589846955247066, "total_pct": 0.6938648150310351}, {"day": 3, "bigc": 338172.6974999981, "lotus": 187419.9964639999, "total": 525592.693963998, "bigc_pct": 0.9115959671739079, "lotus_pct": 0.8544146897623525, "total_pct": 0.8903482793925649}, {"day": 4, "bigc": 246850.03789999906, "lotus": 126296.9980320001, "total": 373147.03593199915, "bigc_pct": 0.6654218412956496, "lotus_pct": 0.5757657263223535, "total_pct": 0.6321070007591242}, {"day": 5, "bigc": 238766.00599999903, "lotus": 124401.99710900031, "total": 363168.00310899934, "bigc_pct": 0.6436301031304321, "lotus_pct": 0.567126751526325, "total_pct": 0.6152026282174305}, {"day": 6, "bigc": 253719.27739999883, "lotus": 140273.99897100023, "total": 393993.27637099905, "bigc_pct": 0.6839389216869534, "lotus_pct": 0.6394844070736775, "total_pct": 0.6674203042350256}, {"day": 7, "bigc": 313301.4034999987, "lotus": 205764.99698499934, "total": 519066.400484998, "bigc_pct": 0.844551609434779, "lotus_pct": 0.9380463097845557, "total_pct": 0.8792928095647506}, {"day": 8, "bigc": 390256.60599999846, "lotus": 205674.99682399983, "total": 595931.6028239983, "bigc_pct": 1.051996068347822, "lotus_pct": 0.9376360149329404, "total_pct": 1.009501622270161}, {"day": 9, "bigc": 256381.66209999908, "lotus": 116369.99738300027, "total": 372751.65948299936, "bigc_pct": 0.6911157847913019, "lotus_pct": 0.5305102821872071, "total_pct": 0.6314372373755727}, {"day": 10, "bigc": 238784.96639999902, "lotus": 137377.99806800028, "total": 376162.9644679993, "bigc_pct": 0.6436812137739104, "lotus_pct": 0.6262820500158836, "total_pct": 0.6372159507381409}, {"day": 11, "bigc": 222750.09619999956, "lotus": 119255.99688900018, "total": 342006.09308899974, "bigc_pct": 0.6004567810608684, "lotus_pct": 0.5436670446410302, "total_pct": 0.5793545839212564}, {"day": 12, "bigc": 232450.08489999964, "lotus": 131770.9979780004, "total": 364221.08287800004, "bigc_pct": 0.6266045766869556, "lotus_pct": 0.6007207260761783, "total_pct": 0.6169865338370493}, {"day": 13, "bigc": 272630.10429999913, "lotus": 129051.99754500025, "total": 401682.10184499936, "bigc_pct": 0.7349159333304325, "lotus_pct": 0.5883252829257364, "total_pct": 0.6804450905571027}, {"day": 14, "bigc": 332296.5035999987, "lotus": 180059.9967559998, "total": 512356.5003559985, "bigc_pct": 0.89575579231304, "lotus_pct": 0.820861749917058, "total_pct": 0.8679263120784674}, {"day": 15, "bigc": 318516.4978999988, "lotus": 203380.996218, "total": 521897.49411799875, "bigc_pct": 0.858609689991301, "lotus_pct": 0.9271780709938234, "total_pct": 0.8840886512381398}, {"day": 16, "bigc": 211494.74479999937, "lotus": 134141.9972820001, "total": 345636.7420819995, "bigc_pct": 0.5701162685913026, "lotus_pct": 0.6115296934914711, "total_pct": 0.5855048636361739}, {"day": 17, "bigc": 218992.94099999932, "lotus": 121603.99772000014, "total": 340596.93871999945, "bigc_pct": 0.5903287974782591, "lotus_pct": 0.5543711660764712, "total_pct": 0.576967491820764}, {"day": 18, "bigc": 229510.02449999945, "lotus": 145597.99765000006, "total": 375108.0221499995, "bigc_pct": 0.6186791964782594, "lotus_pct": 0.663755577522059, "total_pct": 0.6354288899808734}, {"day": 19, "bigc": 242428.93699999893, "lotus": 139690.00003300005, "total": 382118.937032999, "bigc_pct": 0.6535040910434754, "lotus_pct": 0.6368220589739708, "total_pct": 0.647305303170654}, {"day": 20, "bigc": 249875.7731999991, "lotus": 115998.99703200007, "total": 365874.77023199917, "bigc_pct": 0.6735781712347801, "lotus_pct": 0.5288189570576474, "total_pct": 0.6197878621416378}, {"day": 21, "bigc": 288912.9255999995, "lotus": 166623.99552099995, "total": 455536.92112099944, "bigc_pct": 0.778808755965216, "lotus_pct": 0.759609391345735, "total_pct": 0.771674565833387}, {"day": 22, "bigc": 338634.2205999992, "lotus": 203189.9975799994, "total": 541824.2181799986, "bigc_pct": 0.912840072921737, "lotus_pct": 0.9263073419088208, "total_pct": 0.9178443040207626}, {"day": 23, "bigc": 244337.93469999928, "lotus": 118257.99804500029, "total": 362595.9327449996, "bigc_pct": 0.6586500848434763, "lotus_pct": 0.5391173440286778, "total_pct": 0.6142335472729501}, {"day": 24, "bigc": 277816.16960000014, "lotus": 135075.9979280002, "total": 412892.1675280003, "bigc_pct": 0.7488957615304351, "lotus_pct": 0.6157876376129421, "total_pct": 0.6994348193097273}, {"day": 25, "bigc": 240499.1492000001, "lotus": 134330.99758800038, "total": 374830.1467880005, "bigc_pct": 0.6483020543652177, "lotus_pct": 0.6123913125335311, "total_pct": 0.6349581721545363}, {"day": 26, "bigc": 277244.97150000004, "lotus": 119920.99793000011, "total": 397165.9694300002, "bigc_pct": 0.7473560101304348, "lotus_pct": null, "total_pct": 1.0706213088982612}, {"day": 27, "bigc": 273189.14719999995, "lotus": 132332.9966460003, "total": 405522.14384600025, "bigc_pct": 0.7364229185391303, "lotus_pct": 0.6032827788273544, "total_pct": 0.686950079739126}, {"day": 28, "bigc": 334980.3632, "lotus": 199220.99511299972, "total": 534201.3583129997, "bigc_pct": 0.9029905442782609, "lotus_pct": 0.9082133600739692, "total_pct": 0.9049312627160104}, {"day": 29, "bigc": 399874.8146000001, "lotus": 206319.9946429994, "total": 606194.8092429995, "bigc_pct": 1.0779234132695654, "lotus_pct": 0.9405764461666148, "total_pct": 1.0268873817777586}, {"day": 30, "bigc": 281409.8395, "lotus": 141521.9975370001, "total": 422931.8370370001, "bigc_pct": 0.7585830456086956, "lotus_pct": 0.6451738123010299, "total_pct": 0.7164419097348089}, {"day": 31, "bigc": 255700.04, "lotus": 134722.99893600025, "total": 390423.03893600026, "bigc_pct": 0.6892783686956522, "lotus_pct": 0.614178377502354, "total_pct": 0.6613723610391261}], "actual_days": 31, "summary": {"total_bigc": 8707922.096499974, "total_lotus": 4673110.915102002, "total_total": 13381033.011601977, "target_bigc": 11500000.000000006, "target_lotus": 6580645.161290325, "target_total": 18080645.16129032, "pct_bigc": 0.7572106170869539, "pct_lotus": 0.7101295998439314, "pct_total": 0.7400749747719203, "avg_bigc": 280900.71279032173, "avg_lotus": 150745.51339038718, "forecast_bigc": 8707922.096499974, "forecast_lotus": 4673110.915102002, "forecast_total": 13381033.011601977, "lm_pct_bigc": 0.12405788866429202, "lm_pct_lotus": 0.11301084446555776, "lm_pct_total": 0.12017505274101592, "ly_pct_bigc": -0.14337524504503085, "ly_pct_lotus": -0.2039671124523933, "ly_pct_total": -0.16555702717207577, "ly_total_bigc": 10165386.940000035, "ly_total_lotus": 5870499.810000032, "ly_total_total": 16035886.750000067, "lm_total_bigc": 7746862.669899964, "lm_total_lotus": 4198621.1889480045, "lm_total_total": 11945483.858847968}}};
-const sheets = Object.keys(RAW);
-const fM = v => v==null?'--':(v/1e6).toFixed(2)+'M';
-const fK = v => v==null?'--':v>=1e6?fM(v):v>=1e3?(v/1e3).toFixed(0)+'K':Math.round(v);
-const fP = v => v==null?'--':(v*100).toFixed(1)+'%';
-const fC = v => v==null?'--':(v>=0?'+':'')+(v*100).toFixed(1)+'%';
-const bo = {responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}};
-function sw(id,el){
-  document.querySelectorAll('.v').forEach(e=>e.classList.remove('on'));
-  document.querySelectorAll('.tab').forEach(e=>e.classList.remove('on'));
-  document.getElementById('v-'+id).classList.add('on'); el.classList.add('on');
-}
-function sh(h){return h.replace(/WACOAL LOTUS-BIGC IN ?/gi,'').trim();}
-function pClass(p){return p>=1?'up':p>=0.85?'bl':'dn';}
-function bar(p,col){return '<div class="pb"><div class="pf" style="width:'+Math.min(Math.round(p*100),100)+'%;background:'+col+'"></div></div>';}
-
-// Overview cards
-(function(){
-  let html='';
-  sheets.forEach(sname=>{
-    const d=RAW[sname],s=d.summary,isP=d.actual_days<28;
-    const badge=isP
-      ?'<span style="font-size:10px;padding:2px 8px;border-radius:12px;background:#fef3c7;color:#92400e;font-weight:700;margin-left:6px">'+d.actual_days+' วัน - Forecast</span>'
-      :'<span style="font-size:10px;padding:2px 8px;border-radius:12px;background:#d1fae5;color:#065f46;font-weight:700;margin-left:6px">ครบ '+d.actual_days+' วัน</span>';
-    const fcB=isP?s.forecast_bigc:s.total_bigc,fcL=isP?s.forecast_lotus:s.total_lotus,fcT=isP?s.forecast_total:s.total_total;
-    const pB=fcB&&s.target_bigc?fcB/s.target_bigc:(s.pct_bigc||0);
-    const pL=fcL&&s.target_lotus?fcL/s.target_lotus:(s.pct_lotus||0);
-    const pT=fcT&&s.target_total?fcT/s.target_total:(s.pct_total||0);
-    html+='<div style="margin-bottom:16px"><div style="font-size:14px;font-weight:700;color:#1a2340;margin-bottom:9px">'+sh(d.header)+badge+'</div><div class="g3">';
-    html+='<div class="metric"><div class="ml">Big C '+(isP?'Forecast':'Actual')+'</div><div class="mv">'+fM(fcB)+'</div><div class="ms '+pClass(pB)+'">'+(pB?(pB*100).toFixed(1)+'% TG':'--')+'</div>'+bar(pB,'#2563eb')+'</div>';
-    html+='<div class="metric"><div class="ml">Lotus '+(isP?'Forecast':'Actual')+'</div><div class="mv">'+fM(fcL)+'</div><div class="ms '+pClass(pL)+'">'+(pL?(pL*100).toFixed(1)+'% TG':'--')+'</div>'+bar(pL,'#059669')+'</div>';
-    html+='<div class="metric"><div class="ml">รวม '+(isP?'Forecast':'Actual')+'</div><div class="mv">'+fM(fcT)+'</div><div class="ms '+pClass(pT)+'">'+(pT?(pT*100).toFixed(1)+'% TG':'--')+'</div>'+bar(pT,'#7c3aed')+'</div>';
-    html+='</div><div style="font-size:12px;color:#6b7280;margin-top:6px">vs LM: BigC <span class="'+(s.lm_pct_bigc>=0?'up':'dn')+'">'+fC(s.lm_pct_bigc)+'</span> &nbsp;&#183;&nbsp; Lotus <span class="'+(s.lm_pct_lotus>=0?'up':'dn')+'">'+fC(s.lm_pct_lotus)+'</span>&nbsp;&nbsp;|&nbsp;&nbsp;vs LY: BigC <span class="'+(s.ly_pct_bigc>=0?'up':'dn')+'">'+fC(s.ly_pct_bigc)+'</span> &nbsp;&#183;&nbsp; Lotus <span class="'+(s.ly_pct_lotus>=0?'up':'dn')+'">'+fC(s.ly_pct_lotus)+'</span></div></div>';
-  });
-  document.getElementById('ov-cards').innerHTML=html;
-})();
-
-// Ov chart 1 - monthly stacked bar
-(function(){
-  const isP=s=>RAW[s].actual_days<28;
-  const labels=sheets.map(s=>sh(RAW[s].header));
-  new Chart(document.getElementById('cov1'),{
-    type:'bar',
-    data:{labels,datasets:[
-      {label:'Big C',data:sheets.map(s=>isP(s)?RAW[s].summary.forecast_bigc:RAW[s].summary.total_bigc),backgroundColor:'rgba(37,99,235,0.82)',stack:'s'},
-      {label:'Lotus',data:sheets.map(s=>isP(s)?RAW[s].summary.forecast_lotus:RAW[s].summary.total_lotus),backgroundColor:'rgba(5,150,105,0.78)',stack:'s'},
-      {label:'Target',data:sheets.map(s=>RAW[s].summary.target_total),type:'line',borderColor:'#dc2626',borderWidth:2,borderDash:[6,3],pointRadius:7,pointStyle:'crossRot',pointBorderWidth:2.5,fill:false,order:0},
-    ]},
-    options:{...bo,plugins:{legend:{display:true,labels:{font:{size:11},boxWidth:10,padding:10}}},
-      scales:{x:{ticks:{font:{size:12}}},y:{ticks:{font:{size:10},callback:fM},stacked:true}}}
-  });
-})();
-
-// Ov chart 2 - %TG
-(function(){
-  const isP=s=>RAW[s].actual_days<28;
-  function calcP(s,fk,tk,pk){const d=RAW[s],fc=isP(s)?d.summary['forecast_'+fk]:d.summary['total_'+fk],tg=d.summary['target_'+tk];return fc&&tg?+(fc/tg*100).toFixed(1):(d.summary[pk]?+(d.summary[pk]*100).toFixed(1):null);}
-  const labels=sheets.map(s=>sh(RAW[s].header));
-  new Chart(document.getElementById('cov2'),{
-    type:'bar',
-    data:{labels,datasets:[
-      {label:'Big C',data:sheets.map(s=>calcP(s,'bigc','bigc','pct_bigc')),backgroundColor:'rgba(37,99,235,0.82)'},
-      {label:'Lotus',data:sheets.map(s=>calcP(s,'lotus','lotus','pct_lotus')),backgroundColor:'rgba(5,150,105,0.78)'},
-      {label:'Total',data:sheets.map(s=>calcP(s,'total','total','pct_total')),backgroundColor:'rgba(124,58,237,0.72)'},
-      {label:'100%',data:labels.map(()=>100),type:'line',borderColor:'#dc2626',borderWidth:1.5,borderDash:[5,3],pointRadius:0,fill:false},
-    ]},
-    options:{...bo,plugins:{legend:{display:true,labels:{font:{size:10},boxWidth:9,padding:8}}},
-      scales:{x:{ticks:{font:{size:12}}},y:{min:50,max:115,ticks:{font:{size:10},callback:v=>v+'%'}}}}
-  });
-})();
-
-// Detail tabs
-(function(){
-  const stDiv=document.getElementById('sheet-tabs'),dtDiv=document.getElementById('detail-content');
-  let charts={};
-  function showSheet(sname,el){
-    document.querySelectorAll('.stab').forEach(e=>e.classList.remove('on'));
-    el.classList.add('on');
-    const d=RAW[sname],s=d.summary,isP=d.actual_days<28;
-    const ad=d.daily.filter(r=>r.bigc!=null||r.lotus!=null);
-    const days=ad.map(r=>r.day),bD=ad.map(r=>r.bigc),lD=ad.map(r=>r.lotus),tD=bD.map((v,i)=>(v||0)+(lD[i]||0));
-    const pBD=bD.map(v=>v?+(v/370967.74*100).toFixed(1):null);
-    const pLD=lD.map(v=>v?+(v/219354.84*100).toFixed(1):null);
-    let html='';
-    if(isP) html+='<div class="note">ข้อมูลจริง '+d.actual_days+' วัน - Forecast ใช้ avg x 30 วัน</div>';
-    html+='<div class="g4"><div class="metric"><div class="ml">ยอดขายรวม</div><div class="mv">'+fM(s.total_total||s.forecast_total)+'</div><div class="ms">เป้า '+fM(s.target_total)+'</div></div>';
-    html+='<div class="metric"><div class="ml">Big C</div><div class="mv">'+fM(s.total_bigc||s.forecast_bigc)+'</div><div class="ms '+((s.pct_bigc||0)<0.85?'dn':'bl')+'">'+fP(s.pct_bigc)+' TG</div></div>';
-    html+='<div class="metric"><div class="ml">Lotus</div><div class="mv">'+fM(s.total_lotus||s.forecast_lotus)+'</div><div class="ms '+((s.pct_lotus||0)<0.85?'dn':'bl')+'">'+fP(s.pct_lotus)+' TG</div></div>';
-    html+='<div class="metric"><div class="ml">Avg/Day รวม</div><div class="mv">'+fK((s.avg_bigc||0)+(s.avg_lotus||0))+'</div><div class="ms">BigC '+fK(s.avg_bigc)+' - Lotus '+fK(s.avg_lotus)+'</div></div></div>';
-    html+='<div class="card"><div class="ct">ยอดขายรายวัน</div><div class="leg"><span><span class="ld" style="background:#2563eb"></span>BigC</span><span><span class="ld" style="background:#059669"></span>Lotus</span><span><span class="ld" style="background:#7c3aed"></span>Total</span><span><span class="ld" style="background:#fecaca;border:1px dashed #dc2626"></span>เป้า BigC</span><span><span class="ld" style="background:#a7f3d0;border:1px dashed #059669"></span>เป้า Lotus</span></div><div class="cw" style="height:250px"><canvas id="dbar"></canvas></div></div>';
-    html+='<div class="g2"><div class="card"><div class="ct">% Achievement รายวัน</div><div class="cw" style="height:200px"><canvas id="dpct"></canvas></div></div><div class="card"><div class="ct">Cumulative vs Target</div><div class="cw" style="height:200px"><canvas id="dcum"></canvas></div></div></div>';
-    dtDiv.innerHTML=html;
-    setTimeout(()=>{
-      Object.values(charts).forEach(c=>{try{c.destroy();}catch(e){}});
-      charts={};
-      charts.dbar=new Chart(document.getElementById('dbar'),{type:'bar',data:{labels:days,datasets:[
-        {label:'BigC',data:bD,backgroundColor:'rgba(37,99,235,0.78)',stack:'s'},{label:'Lotus',data:lD,backgroundColor:'rgba(5,150,105,0.75)',stack:'s'},
-        {label:'Total',data:tD,type:'line',borderColor:'#7c3aed',borderWidth:2,pointRadius:2,tension:0.3,fill:false,order:0},
-        {label:'TgtB',data:days.map(()=>370967.74),type:'line',borderColor:'#dc2626',borderWidth:1.2,borderDash:[4,3],pointRadius:0,fill:false,order:0},
-        {label:'TgtL',data:days.map(()=>219354.84),type:'line',borderColor:'#059669',borderWidth:1.2,borderDash:[4,3],pointRadius:0,fill:false,order:0},
-      ]},options:{...bo,scales:{x:{ticks:{font:{size:9},maxTicksLimit:16,maxRotation:0},stacked:true},y:{ticks:{font:{size:9},callback:fK}}}}});
-      charts.dpct=new Chart(document.getElementById('dpct'),{type:'line',data:{labels:days,datasets:[
-        {label:'BigC%',data:pBD,borderColor:'#2563eb',backgroundColor:'rgba(37,99,235,0.08)',borderWidth:2,pointRadius:2,tension:0.3,fill:true},
-        {label:'Lotus%',data:pLD,borderColor:'#059669',backgroundColor:'rgba(5,150,105,0.08)',borderWidth:2,pointRadius:2,tension:0.3,fill:true},
-        {label:'100%',data:days.map(()=>100),borderColor:'#dc2626',borderWidth:1.5,borderDash:[5,3],pointRadius:0,fill:false},
-      ]},options:{...bo,scales:{x:{ticks:{font:{size:9},maxTicksLimit:16,maxRotation:0}},y:{min:40,ticks:{font:{size:9},callback:v=>v+'%'}}}}});
-      let sb=0,sl=0,st=0;const cB=[],cL=[],cT=[];
-      bD.forEach((v,i)=>{sb+=(v||0);sl+=(lD[i]||0);st+=tD[i];cB.push(Math.round(sb));cL.push(Math.round(sl));cT.push(Math.round(st));});
-      charts.dcum=new Chart(document.getElementById('dcum'),{type:'line',data:{labels:days,datasets:[
-        {label:'CumTotal',data:cT,borderColor:'#7c3aed',backgroundColor:'rgba(124,58,237,0.07)',borderWidth:2.5,pointRadius:0,tension:0.3,fill:true},
-        {label:'CumBigC',data:cB,borderColor:'#2563eb',borderWidth:1.5,pointRadius:0,tension:0.3,fill:false},
-        {label:'CumLotus',data:cL,borderColor:'#059669',borderWidth:1.5,pointRadius:0,tension:0.3,fill:false},
-        {label:'Target',data:days.map(()=>s.target_total),borderColor:'#dc2626',borderWidth:1.5,borderDash:[5,4],pointRadius:0,fill:false},
-      ]},options:{...bo,scales:{x:{ticks:{font:{size:9},maxTicksLimit:16,maxRotation:0}},y:{ticks:{font:{size:9},callback:fM}}}}});
-    },50);
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>WACOAL — Stock Management</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600;700&family=Sarabun:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --rose:     #c0516e;
+    --rose-dark:#8b2d45;
+    --rose-lt:  #f7dde5;
+    --gold:     #c9a96e;
+    --gold-lt:  #f5edd8;
+    --black:    #1a1014;
+    --charcoal: #2d1f25;
+    --gray:     #6b5560;
+    --white:    #fdf8fa;
+    --card-bg:  #ffffff;
+    --border:   rgba(192,81,110,.18);
+    --shadow:   0 8px 40px rgba(139,45,69,.13);
   }
-  sheets.forEach((sname,i)=>{
-    const btn=document.createElement('button');
-    btn.className='stab';btn.textContent=sh(RAW[sname].header);
-    btn.onclick=()=>showSheet(sname,btn);stDiv.appendChild(btn);
-    if(i===0){showSheet(sname,btn);btn.classList.add('on');}
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Sarabun', sans-serif;
+    background: var(--black);
+    color: var(--charcoal);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow-x: hidden;
+  }
+
+  /* ── Background pattern ── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 20% 10%, rgba(192,81,110,.22) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 50% at 80% 85%, rgba(201,169,110,.18) 0%, transparent 55%),
+      linear-gradient(160deg, #1a1014 0%, #2d1a20 50%, #1a1014 100%);
+    z-index: 0;
+  }
+  body::after {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23c0516e' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    opacity: .5;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  /* ── App shell ── */
+  #app {
+    position: relative; z-index: 1;
+    width: 100%; max-width: 520px;
+    padding: 24px 16px;
+  }
+
+  /* ── Logo / Header ── */
+  .brand-header {
+    text-align: center;
+    margin-bottom: 36px;
+    animation: fadeDown .7s ease both;
+  }
+  .brand-logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 6px;
+  }
+  .brand-logo .diamond {
+    width: 38px; height: 38px;
+    background: linear-gradient(135deg, var(--rose) 0%, var(--rose-dark) 100%);
+    transform: rotate(45deg);
+    border-radius: 4px;
+    box-shadow: 0 4px 16px rgba(192,81,110,.5);
+    flex-shrink: 0;
+  }
+  .brand-logo .name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.6rem;
+    font-weight: 700;
+    letter-spacing: .22em;
+    color: var(--white);
+    line-height: 1;
+  }
+  .brand-tagline {
+    font-size: .75rem;
+    letter-spacing: .35em;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 500;
+  }
+
+  /* ── Card ── */
+  .card {
+    background: var(--card-bg);
+    border-radius: 20px;
+    padding: 40px 36px;
+    box-shadow: var(--shadow), 0 0 0 1px var(--border);
+    position: relative;
+    overflow: hidden;
+    animation: fadeUp .65s ease both .15s;
+  }
+  .card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--rose-dark), var(--rose), var(--gold), var(--rose));
+    background-size: 200%;
+    animation: shimmer 3s linear infinite;
+  }
+  @keyframes shimmer { 0%{background-position:0%} 100%{background-position:200%} }
+
+  .card-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.55rem;
+    font-weight: 600;
+    color: var(--charcoal);
+    margin-bottom: 4px;
+  }
+  .card-sub {
+    font-size: .8rem;
+    color: var(--gray);
+    letter-spacing: .05em;
+    margin-bottom: 28px;
+  }
+
+  /* ── Divider ── */
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+    margin: 20px 0;
+  }
+
+  /* ── Form elements ── */
+  label {
+    display: block;
+    font-size: .78rem;
+    font-weight: 600;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--rose-dark);
+    margin-bottom: 6px;
+  }
+  .field { margin-bottom: 20px; }
+
+  input, select {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    font-family: 'Sarabun', sans-serif;
+    font-size: .95rem;
+    color: var(--charcoal);
+    background: var(--white);
+    transition: border-color .2s, box-shadow .2s;
+    outline: none;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+  input:focus, select:focus {
+    border-color: var(--rose);
+    box-shadow: 0 0 0 3px rgba(192,81,110,.13);
+  }
+  input::placeholder { color: #bba5ad; }
+
+  /* password toggle */
+  .pw-wrap { position: relative; }
+  .pw-wrap input { padding-right: 44px; }
+  .pw-toggle {
+    position: absolute; right: 14px; top: 50%;
+    transform: translateY(-50%);
+    background: none; border: none;
+    cursor: pointer; padding: 4px;
+    color: var(--gray);
+    font-size: 1rem;
+    line-height: 1;
+  }
+  .pw-toggle:hover { color: var(--rose); }
+
+  /* select arrow */
+  .select-wrap { position: relative; }
+  .select-wrap::after {
+    content: '▾';
+    position: absolute; right: 14px; top: 50%;
+    transform: translateY(-50%);
+    color: var(--rose);
+    pointer-events: none;
+    font-size: .9rem;
+  }
+
+  /* readonly display */
+  .field-display {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    font-size: .95rem;
+    color: var(--charcoal);
+    background: var(--rose-lt);
+    font-family: 'Sarabun', sans-serif;
+    font-weight: 600;
+    min-height: 44px;
+    letter-spacing: .05em;
+  }
+  .field-display.gold { background: var(--gold-lt); }
+
+  /* ── Primary Button ── */
+  .btn {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 12px;
+    font-family: 'Sarabun', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: transform .15s, box-shadow .15s, opacity .15s;
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--rose-dark) 0%, var(--rose) 60%, #d4637e 100%);
+    color: #fff;
+    box-shadow: 0 6px 24px rgba(192,81,110,.38);
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(192,81,110,.45); }
+  .btn-primary:active { transform: translateY(0); }
+  .btn-secondary {
+    background: transparent;
+    color: var(--rose-dark);
+    border: 1.5px solid var(--border);
+    margin-top: 10px;
+  }
+  .btn-secondary:hover { background: var(--rose-lt); }
+  .btn:disabled { opacity: .55; cursor: not-allowed; transform: none !important; }
+
+  /* ── Alert ── */
+  .alert {
+    display: none;
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-size: .88rem;
+    margin-bottom: 18px;
+    font-weight: 500;
+  }
+  .alert.error { background: #fdecea; color: #b71c1c; border: 1px solid #f5c6cb; display: block; }
+  .alert.success { background: #e8f5e9; color: #2e7d32; border: 1px solid #c8e6c9; display: block; }
+  .alert.info { background: var(--rose-lt); color: var(--rose-dark); border: 1px solid var(--border); display: block; }
+
+  /* ── User info bar ── */
+  .user-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--rose-lt);
+    border-radius: 10px;
+    padding: 10px 14px;
+    margin-bottom: 22px;
+    border: 1px solid var(--border);
+  }
+  .user-avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--rose-dark), var(--rose));
+    display: flex; align-items: center; justify-content: center;
+    color: #fff;
+    font-weight: 700;
+    font-size: .95rem;
+    flex-shrink: 0;
+  }
+  .user-info { flex: 1; }
+  .user-name { font-weight: 600; font-size: .9rem; color: var(--charcoal); }
+  .user-code { font-size: .75rem; color: var(--gray); }
+  .logout-btn {
+    background: none; border: none;
+    color: var(--rose-dark); font-size: .75rem;
+    font-weight: 600; cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: background .15s;
+  }
+  .logout-btn:hover { background: rgba(192,81,110,.12); }
+
+  /* ── Item list ── */
+  #item-list { margin-top: 28px; }
+  .section-label {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.1rem;
+    color: var(--rose-dark);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1; height: 1px;
+    background: linear-gradient(90deg, var(--border), transparent);
+  }
+
+  .item-row {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 8px;
+    align-items: center;
+    padding: 10px 14px;
+    border-radius: 10px;
+    background: var(--white);
+    border: 1.5px solid var(--border);
+    margin-bottom: 8px;
+    animation: fadeUp .3s ease both;
+    transition: border-color .2s;
+  }
+  .item-row:hover { border-color: var(--rose); }
+  .item-code { font-weight: 600; font-size: .9rem; color: var(--charcoal); }
+  .item-qty {
+    width: 70px;
+    padding: 6px 10px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    text-align: center;
+    font-size: .95rem;
+    font-family: 'Sarabun', sans-serif;
+    font-weight: 600;
+    color: var(--charcoal);
+    background: var(--white);
+    outline: none;
+    transition: border-color .2s;
+  }
+  .item-qty:focus { border-color: var(--rose); }
+  .remove-btn {
+    background: none; border: none;
+    color: #ccc; cursor: pointer;
+    font-size: 1.1rem;
+    line-height: 1;
+    padding: 2px 4px;
+    border-radius: 4px;
+    transition: color .15s;
+  }
+  .remove-btn:hover { color: var(--rose); }
+
+  /* add item row */
+  .add-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  /* ── Bill badge ── */
+  .bill-badge {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.05rem;
+    letter-spacing: .05em;
+    color: var(--rose-dark);
+    font-weight: 600;
+  }
+
+  /* ── Loading spinner ── */
+  .spinner {
+    display: inline-block;
+    width: 18px; height: 18px;
+    border: 2.5px solid rgba(255,255,255,.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin .7s linear infinite;
+    vertical-align: middle;
+    margin-right: 6px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── Animations ── */
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── Page transitions ── */
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* ── Success overlay ── */
+  #success-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    z-index: 999;
+    background: rgba(26,16,20,.85);
+    backdrop-filter: blur(6px);
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+  }
+  #success-overlay.show { display: flex; }
+  .success-icon {
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--rose-dark), var(--rose));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2.2rem;
+    margin-bottom: 20px;
+    box-shadow: 0 8px 32px rgba(192,81,110,.5);
+    animation: popIn .5s cubic-bezier(.34,1.56,.64,1) both;
+  }
+  @keyframes popIn {
+    from { transform: scale(0); opacity: 0; }
+    to   { transform: scale(1); opacity: 1; }
+  }
+  .success-text {
+    color: var(--white);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.6rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .success-sub { color: var(--gold); font-size: .9rem; margin-bottom: 28px; }
+
+  @media (max-width: 480px) {
+    .card { padding: 28px 20px; }
+    .brand-logo .name { font-size: 2.1rem; }
+    #app { padding: 20px 12px; }
+  }
+</style>
+</head>
+<body>
+
+<div id="app">
+  <!-- ── Brand Header ── -->
+  <div class="brand-header">
+    <div class="brand-logo">
+      <div class="diamond"></div>
+      <div class="name">WACOAL</div>
+    </div>
+    <div class="brand-tagline">Stock Management System</div>
+  </div>
+
+  <!-- ══════════ PAGE 1: LOGIN ══════════ -->
+  <div class="page active" id="page-login">
+    <div class="card">
+      <div class="card-title">เข้าสู่ระบบ</div>
+      <div class="card-sub">กรุณาใส่รหัสพนักงานและรหัสผ่านเพื่อดำเนินการต่อ</div>
+
+      <div id="login-alert" class="alert"></div>
+
+      <div class="field">
+        <label>รหัสพนักงาน (Emp. Code)</label>
+        <input type="text" id="login-user" placeholder="เช่น EMP001" autocomplete="username" />
+      </div>
+
+      <div class="field">
+        <label>รหัสผ่าน</label>
+        <div class="pw-wrap">
+          <input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password" />
+          <button class="pw-toggle" onclick="togglePw()" id="pw-icon" title="แสดง/ซ่อนรหัสผ่าน">👁</button>
+        </div>
+      </div>
+
+      <button class="btn btn-primary" id="login-btn" onclick="doLogin()">
+        เข้าสู่ระบบ
+      </button>
+    </div>
+  </div>
+
+  <!-- ══════════ PAGE 2: STOCK ENTRY ══════════ -->
+  <div class="page" id="page-stock">
+    <div class="card">
+      <div class="user-bar">
+        <div class="user-avatar" id="user-avatar">W</div>
+        <div class="user-info">
+          <div class="user-name" id="user-display-name">—</div>
+          <div class="user-code" id="user-display-code">—</div>
+        </div>
+        <button class="logout-btn" onclick="doLogout()">ออกจากระบบ</button>
+      </div>
+
+      <div class="card-title">บันทึกการตัดสต็อก</div>
+      <div class="card-sub">กรอกข้อมูลรายการสินค้าที่ต้องการตัดสต็อก</div>
+
+      <div id="stock-alert" class="alert"></div>
+
+      <!-- Store (readonly) -->
+      <div class="field">
+        <label>Store (รหัสพนักงาน)</label>
+        <div class="field-display" id="field-store">—</div>
+      </div>
+
+      <!-- TransDate -->
+      <div class="field">
+        <label>วันที่ทำรายการ (Trans Date)</label>
+        <input type="date" id="field-date" onchange="updateBill()" />
+      </div>
+
+      <!-- Bill No -->
+      <div class="field">
+        <label>เลขที่บิล (Bill No.)</label>
+        <div class="field-display gold bill-badge" id="field-bill">—</div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Item list section -->
+      <div class="section-label">เพิ่มรายการสินค้า</div>
+
+      <!-- Add item row -->
+      <div class="add-row">
+        <div class="select-wrap">
+          <select id="item-select" disabled>
+            <option value="">— กำลังโหลดข้อมูลสินค้า... —</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" style="width:auto;padding:12px 18px;border-radius:10px;font-size:.85rem" onclick="addItem()">+ เพิ่ม</button>
+      </div>
+
+      <!-- Item rows -->
+      <div id="item-list"></div>
+
+      <div class="divider"></div>
+
+      <button class="btn btn-primary" id="save-btn" onclick="doSave()" disabled>
+        บันทึกข้อมูล
+      </button>
+      <button class="btn btn-secondary" onclick="resetForm()">เคลียร์ข้อมูล</button>
+    </div>
+  </div>
+</div><!-- /app -->
+
+<!-- ── Success Overlay ── -->
+<div id="success-overlay">
+  <div class="success-icon">✓</div>
+  <div class="success-text">บันทึกสำเร็จ</div>
+  <div class="success-sub" id="success-bill-text">—</div>
+  <button class="btn btn-primary" style="width:auto;padding:12px 32px" onclick="afterSave()">บันทึกรายการใหม่</button>
+</div>
+
+<script>
+// ════════════════════════════════════════
+//  ⚙️  CONFIG — ใส่ URL ของ GAS ที่ Deploy แล้วตรงนี้
+// ════════════════════════════════════════
+const GAS_URL = 'https://script.google.com/macros/s/AKfycby2zTU-ncNtZXn8pXQZFAZPDBptKp23Tzdk_kZDyMruHaisyze-HWAL5guU0MQEwOyx/exec';
+// ════════════════════════════════════════
+
+let currentUser = null;
+let stockItems  = [];
+let cartItems   = [];
+
+/* ── Helpers ── */
+function fmt(msg, type='error') {
+  const el = document.getElementById(currentUser ? 'stock-alert' : 'login-alert');
+  el.className = 'alert ' + type;
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+function clearAlert(id) {
+  const el = document.getElementById(id);
+  el.style.display = 'none';
+  el.textContent = '';
+}
+function setLoading(btnId, loading, text='บันทึกข้อมูล') {
+  const btn = document.getElementById(btnId);
+  if (loading) {
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> กำลังดำเนินการ...';
+  } else {
+    btn.disabled = false;
+    btn.innerHTML = text;
+  }
+}
+function togglePw() {
+  const inp = document.getElementById('login-pass');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+}
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+/* ── Date helpers ── */
+function todayISO() {
+  const d = new Date();
+  return d.toISOString().split('T')[0];
+}
+function buildBillNo(dateVal) {
+  if (!dateVal) return '—';
+  const d = dateVal.replace(/-/g,'');
+  return d + '0111';
+}
+function updateBill() {
+  const v = document.getElementById('field-date').value;
+  document.getElementById('field-bill').textContent = buildBillNo(v);
+  checkSaveReady();
+}
+
+/* ── GAS call ── */
+async function gasCall(action, payload={}) {
+  const body = JSON.stringify({ action, ...payload });
+  const res = await fetch(GAS_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body
   });
-})();
+  if (!res.ok) throw new Error('Network error ' + res.status);
+  return res.json();
+}
 
-// Compare
-(function(){
-  const clrs=['rgba(37,99,235,0.82)','rgba(5,150,105,0.78)','rgba(124,58,237,0.7)','rgba(239,159,39,0.6)','rgba(239,100,70,0.5)'];
-  const isP=s=>RAW[s].actual_days<28;
-  const ds=sheets.map((s,i)=>{const d=RAW[s];return{label:sh(d.header),data:[isP(s)?d.summary.forecast_bigc:d.summary.total_bigc,isP(s)?d.summary.forecast_lotus:d.summary.total_lotus,isP(s)?d.summary.forecast_total:d.summary.total_total],backgroundColor:clrs[i%clrs.length]};});
-  const s0=RAW[sheets[0]]?.summary;
-  if(s0?.ly_total_bigc) ds.push({label:'LY (ref)',data:[s0.ly_total_bigc,s0.ly_total_lotus,s0.ly_total_total],backgroundColor:'rgba(160,160,160,0.45)'});
-  new Chart(document.getElementById('ccmp1'),{type:'bar',data:{labels:['Big C','Lotus','Total'],datasets:ds},
-    options:{...bo,plugins:{legend:{display:true,labels:{font:{size:11},boxWidth:10,padding:9}}},scales:{x:{ticks:{font:{size:12}}},y:{ticks:{font:{size:10},callback:fM}}}}});
+/* ══════════ LOGIN ══════════ */
+async function doLogin() {
+  clearAlert('login-alert');
+  const user = document.getElementById('login-user').value.trim();
+  const pass = document.getElementById('login-pass').value;
+  if (!user || !pass) { fmt('กรุณากรอกรหัสพนักงานและรหัสผ่าน'); return; }
 
-  function calcP(s,fk,tk,pk){const d=RAW[s],ip=isP(s),fc=ip?d.summary['forecast_'+fk]:d.summary['total_'+fk],tg=d.summary['target_'+tk];return fc&&tg?+(fc/tg*100).toFixed(1):(d.summary[pk]?+(d.summary[pk]*100).toFixed(1):null);}
-  const labels=sheets.map(s=>sh(RAW[s].header));
-  new Chart(document.getElementById('ccmp2'),{type:'bar',data:{labels,datasets:[
-    {label:'Big C',data:sheets.map(s=>calcP(s,'bigc','bigc','pct_bigc')),backgroundColor:'rgba(37,99,235,0.82)'},
-    {label:'Lotus',data:sheets.map(s=>calcP(s,'lotus','lotus','pct_lotus')),backgroundColor:'rgba(5,150,105,0.78)'},
-    {label:'Total',data:sheets.map(s=>calcP(s,'total','total','pct_total')),backgroundColor:'rgba(124,58,237,0.7)'},
-    {label:'100%',data:labels.map(()=>100),type:'line',borderColor:'#dc2626',borderWidth:1.5,borderDash:[5,3],pointRadius:0,fill:false},
-  ]},options:{...bo,plugins:{legend:{display:true,labels:{font:{size:10},boxWidth:9,padding:8}}},scales:{x:{ticks:{font:{size:11}}},y:{min:50,max:115,ticks:{font:{size:9},callback:v=>v+'%'}}}}});
+  setLoading('login-btn', true, '');
+  document.getElementById('login-btn').innerHTML = '<span class="spinner"></span> กำลังตรวจสอบ...';
 
-  let thtml='<table class="tbl"><thead><tr><th>Period</th><th>Big C</th><th>Lotus</th><th>Total</th><th>%TG</th><th>vs LM</th><th>vs LY</th></tr></thead><tbody>';
-  sheets.forEach(s=>{
-    const d=RAW[s],sm=d.summary,ip=isP(s);
-    const fcT=ip?sm.forecast_total:sm.total_total,pT=fcT&&sm.target_total?fcT/sm.target_total:(sm.pct_total||0);
-    const cls=pT>=1?'up':pT>=0.85?'bl':'dn';
-    thtml+='<tr><td>'+sh(d.header)+(ip?' <small style="color:#f59e0b">[Fcst]</small>':'')+'</td>';
-    thtml+='<td>'+fM(ip?sm.forecast_bigc:sm.total_bigc)+'</td><td>'+fM(ip?sm.forecast_lotus:sm.total_lotus)+'</td><td>'+fM(fcT)+'</td>';
-    thtml+='<td class="'+cls+'">'+fP(pT)+'</td><td class="'+(sm.lm_pct_total>=0?'up':'dn')+'">'+fC(sm.lm_pct_total)+'</td><td class="'+(sm.ly_pct_total>=0?'up':'dn')+'">'+fC(sm.ly_pct_total)+'</td></tr>';
+  try {
+    const data = await gasCall('login', { username: user, password: pass });
+    if (data.success) {
+      currentUser = data.user; // { empCode, name }
+      initStockPage();
+    } else {
+      fmt(data.message || 'รหัสพนักงานหรือรหัสผ่านไม่ถูกต้อง');
+    }
+  } catch(e) {
+    fmt('ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้ กรุณาลองใหม่อีกครั้ง');
+    console.error(e);
+  } finally {
+    const btn = document.getElementById('login-btn');
+    btn.disabled = false;
+    btn.innerHTML = 'เข้าสู่ระบบ';
+  }
+}
+
+/* ══════════ STOCK PAGE INIT ══════════ */
+async function initStockPage() {
+  showPage('page-stock');
+  clearAlert('stock-alert');
+  cartItems = [];
+
+  // Set user info
+  document.getElementById('field-store').textContent = currentUser.empCode;
+  document.getElementById('user-display-name').textContent = currentUser.name || currentUser.empCode;
+  document.getElementById('user-display-code').textContent = 'รหัส: ' + currentUser.empCode;
+  document.getElementById('user-avatar').textContent = (currentUser.name || currentUser.empCode)[0].toUpperCase();
+
+  // Default date = today
+  document.getElementById('field-date').value = todayISO();
+  updateBill();
+  renderCart();
+
+  // Load stock items
+  try {
+    const data = await gasCall('getStock', { empCode: currentUser.empCode });
+    if (data.success) {
+      stockItems = data.items || [];
+      populateSelect();
+    } else {
+      fmt('โหลดข้อมูลสินค้าไม่สำเร็จ: ' + (data.message||''), 'error');
+    }
+  } catch(e) {
+    fmt('ไม่สามารถโหลดข้อมูลสินค้าได้', 'error');
+    console.error(e);
+  }
+}
+
+function populateSelect() {
+  const sel = document.getElementById('item-select');
+  sel.innerHTML = '<option value="">— เลือกสินค้า (ITEM CODE) —</option>';
+  stockItems.forEach(item => {
+    const opt = document.createElement('option');
+    opt.value = item.itemCode;
+    opt.textContent = item.itemCode + (item.description ? ' — ' + item.description : '');
+    sel.appendChild(opt);
   });
-  thtml+='</tbody></table>';
-  document.getElementById('cmp-table').innerHTML=thtml;
-})();
-</script></body></html>
+  sel.disabled = stockItems.length === 0;
+  if (stockItems.length === 0) {
+    fmt('ไม่พบสินค้าในสต็อกของท่าน', 'info');
+  }
+}
+
+/* ── Cart management ── */
+function addItem() {
+  const sel = document.getElementById('item-select');
+  const code = sel.value;
+  if (!code) return;
+  if (cartItems.find(x => x.itemCode === code)) {
+    fmt('สินค้านี้มีอยู่ในรายการแล้ว', 'info'); return;
+  }
+  cartItems.push({ itemCode: code, qty: 1 });
+  clearAlert('stock-alert');
+  renderCart();
+  checkSaveReady();
+  sel.value = '';
+}
+
+function removeItem(code) {
+  cartItems = cartItems.filter(x => x.itemCode !== code);
+  renderCart();
+  checkSaveReady();
+}
+
+function renderCart() {
+  const list = document.getElementById('item-list');
+  list.innerHTML = '';
+  if (cartItems.length === 0) {
+    list.innerHTML = '<div style="text-align:center;color:#bba5ad;font-size:.88rem;padding:16px 0">ยังไม่มีรายการสินค้า</div>';
+    return;
+  }
+  cartItems.forEach((item, idx) => {
+    const row = document.createElement('div');
+    row.className = 'item-row';
+    row.innerHTML = `
+      <div class="item-code">${item.itemCode}</div>
+      <input class="item-qty" type="number" min="1" value="${item.qty}"
+        onchange="updateQty('${item.itemCode}', this.value)"
+        oninput="updateQty('${item.itemCode}', this.value)"
+        title="จำนวน" />
+      <button class="remove-btn" onclick="removeItem('${item.itemCode}')" title="ลบ">✕</button>
+    `;
+    list.appendChild(row);
+  });
+}
+
+function updateQty(code, val) {
+  const item = cartItems.find(x => x.itemCode === code);
+  if (item) item.qty = parseInt(val) || 1;
+  checkSaveReady();
+}
+
+function checkSaveReady() {
+  const hasDate  = !!document.getElementById('field-date').value;
+  const hasItems = cartItems.length > 0;
+  const allQty   = cartItems.every(x => x.qty > 0);
+  document.getElementById('save-btn').disabled = !(hasDate && hasItems && allQty);
+}
+
+/* ══════════ SAVE ══════════ */
+async function doSave() {
+  clearAlert('stock-alert');
+  const transDate = document.getElementById('field-date').value;
+  const billNo    = buildBillNo(transDate);
+
+  if (!transDate || cartItems.length === 0) {
+    fmt('กรุณากรอกข้อมูลให้ครบถ้วน'); return;
+  }
+
+  setLoading('save-btn', true);
+
+  const rows = cartItems.map(item => ({
+    store:    currentUser.empCode,
+    transDate,
+    billNo,
+    itemCode: item.itemCode,
+    qty:      item.qty
+  }));
+
+  try {
+    const data = await gasCall('saveStock', { rows });
+    if (data.success) {
+      document.getElementById('success-bill-text').textContent = 'Bill No: ' + billNo + ' | ' + cartItems.length + ' รายการ';
+      document.getElementById('success-overlay').classList.add('show');
+    } else {
+      fmt('บันทึกไม่สำเร็จ: ' + (data.message||''));
+    }
+  } catch(e) {
+    fmt('เกิดข้อผิดพลาดในการบันทึกข้อมูล');
+    console.error(e);
+  } finally {
+    setLoading('save-btn', false);
+  }
+}
+
+function afterSave() {
+  document.getElementById('success-overlay').classList.remove('show');
+  cartItems = [];
+  document.getElementById('field-date').value = todayISO();
+  updateBill();
+  renderCart();
+}
+
+function resetForm() {
+  cartItems = [];
+  document.getElementById('field-date').value = todayISO();
+  updateBill();
+  renderCart();
+  clearAlert('stock-alert');
+}
+
+function doLogout() {
+  currentUser = null;
+  stockItems  = [];
+  cartItems   = [];
+  document.getElementById('login-user').value = '';
+  document.getElementById('login-pass').value = '';
+  clearAlert('login-alert');
+  showPage('page-login');
+}
+
+/* ── Enter key on login ── */
+document.addEventListener('DOMContentLoaded', () => {
+  ['login-user','login-pass'].forEach(id => {
+    document.getElementById(id).addEventListener('keydown', e => {
+      if (e.key === 'Enter') doLogin();
+    });
+  });
+});
+</script>
+</body>
+</html>
