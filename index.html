@@ -550,7 +550,7 @@
 // ════════════════════════════════════════
 //  ⚙️  CONFIG — ใส่ URL ของ GAS ที่ Deploy แล้วตรงนี้
 // ════════════════════════════════════════
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbwwMcQevwceRFhtMjqxn_Y8IHVP81zdyuY72O3_SbHNFWp8vnqAIlvwnpLi5qV2m-RG/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbwZZeW8Njyy63ZW8SV_AMrD7CnYl4JhaDHh6Nuu1gcTjVPRd7OUgf71PqpvFXIFz1EO/exec';
 // ════════════════════════════════════════
 
 let currentUser = null;
@@ -763,11 +763,12 @@ async function doSave() {
   setLoading('save-btn', true);
 
   const rows = cartItems.map(item => ({
-    store:    currentUser.empCode,
+    storeName: currentUser.name,
+    store:     currentUser.empCode,
     transDate,
     billNo,
-    itemCode: item.itemCode,
-    qty:      item.qty
+    itemCode:  item.itemCode,
+    qty:       item.qty
   }));
 
   try {
