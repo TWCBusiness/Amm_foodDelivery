@@ -550,7 +550,7 @@
 // ════════════════════════════════════════
 //  ⚙️  CONFIG — ใส่ URL ของ GAS ที่ Deploy แล้วตรงนี้
 // ════════════════════════════════════════
-const GAS_URL = 'https://script.google.com/macros/s/AKfycby2zTU-ncNtZXn8pXQZFAZPDBptKp23Tzdk_kZDyMruHaisyze-HWAL5guU0MQEwOyx/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbyMY0tF7FCUbiqnf839enRgSwnkc7Gh1OsYatu-DoUdNUFhwfWU4HGHGmsbcvBWLba0/exec';
 // ════════════════════════════════════════
 
 let currentUser = null;
@@ -605,13 +605,16 @@ function updateBill() {
 }
 
 /* ── GAS call ── */
-async function gasCall(action, payload={}) {
-  const body = JSON.stringify({ action, ...payload });
-  const res = await fetch(GAS_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body
+async function gasCall(action, payload = {}) {
+  const params = new URLSearchParams();
+  params.append('action', action);
+  params.append('data', JSON.stringify(payload));
+
+  const res = await fetch(GAS_URL + '?' + params.toString(), {
+    method:   'GET',
+    redirect: 'follow'
   });
+
   if (!res.ok) throw new Error('Network error ' + res.status);
   return res.json();
 }
